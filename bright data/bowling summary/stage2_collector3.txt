@@ -1,0 +1,79 @@
+//-------Interaction
+navigate(input.url);
+collect(parse());
+
+
+//-------  Parser Code ------------//
+var match = $('div').filter(function(){
+	return $(this)
+      .find('span > span > span').text() === String("Match Details") 
+}).siblings()
+const s = $("div.ds-flex.ds-items-center.ds-min-w-0.ds-mr-1>a>span").text();
+let matches = s.match(/[A-Z][a-z]*(?=[A-Z][a-z])/g); // This regex matches country names except for cases like "SouthAfrica" or "NewZealand"
+let team1, team2;
+
+if (matches && matches.length === 2) {
+    team1 = matches[0];
+    team2 = matches[1];
+} else {
+    matches = s.match(/(?:South Africa|New Zealand|Sri Lanka)|[A-Z][a-z]*/g); // This regex handles cases like "SouthAfrica" or "NewZealand"
+    if (matches && matches.length === 2) {
+        team1 = matches[0];
+        team2 = matches[1];
+    } else {
+        // Handle other cases or errors here
+    }
+}
+
+matchInfo = team1 + ' Vs ' + team2
+
+var tables = $('div > table.ds-table');
+var firstInningRows = $(tables.eq(1)).find('tbody > tr').filter(function(index, element){
+  return $(this).find("td").length >= 11
+})
+
+var secondInningsRows = $(tables.eq(3)).find('tbody > tr').filter(function(index, element){
+  return $(this).find("td").length >= 11
+});
+
+
+var bowlingSummary = []
+firstInningRows.each((index, element) => {
+  var tds = $(element).find('td');
+  bowlingSummary.push({
+  		"match": matchInfo,
+  		"bowlingTeam": team2,
+   		"bowlerName": $(tds.eq(0)).find('a > span').text().replace(' ', ''),
+    	"overs": $(tds.eq(1)).text(),
+  		"maiden": $(tds.eq(2)).text(), 
+  		"runs": $(tds.eq(3)).text(),
+  		"wickets": $(tds.eq(4)).text(),
+  		"economy": $(tds.eq(5)).text(),
+ 		"0s": $(tds.eq(6)).text(),
+    	"4s": $(tds.eq(7)).text(),
+    	"6s": $(tds.eq(8)).text(),
+    	"wides": $(tds.eq(9)).text(),
+    	"noBalls": $(tds.eq(10)).text()
+  });
+});
+
+secondInningsRows.each((index, element) => {
+  var tds = $(element).find('td');
+   bowlingSummary.push({
+  		"match": matchInfo,
+  		"bowlingTeam": team1,
+   		"bowlerName": $(tds.eq(0)).find('a > span').text().replace(' ', ''),
+    	"overs": $(tds.eq(1)).text(),
+  		"maiden": $(tds.eq(2)).text(), 
+  		"runs": $(tds.eq(3)).text(),
+  		"wickets": $(tds.eq(4)).text(),
+  		"economy": $(tds.eq(5)).text(),
+ 		"0s": $(tds.eq(6)).text(),
+    	"4s": $(tds.eq(7)).text(),
+    	"6s": $(tds.eq(8)).text(),
+    	"wides": $(tds.eq(9)).text(),
+    	"noBalls": $(tds.eq(10)).text()
+  });
+});
+
+return {"bowlingSummary": bowlingSummary}

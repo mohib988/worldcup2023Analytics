@@ -1,0 +1,72 @@
+//-------Interaction
+navigate(input.url);
+collect(parse());
+
+
+//-------  Parser Code ------------//
+var match = $('div').filter(function(){
+	return $(this)
+      .find('span > span > span').text() === String("Match Details") 
+}).siblings()
+const s = $("div.ds-flex.ds-items-center.ds-min-w-0.ds-mr-1>a>span").text();
+let matches = s.match(/[A-Z][a-z]*(?=[A-Z][a-z])/g); // This regex matches country names except for cases like "SouthAfrica" or "NewZealand"
+let team1, team2;
+
+if (matches && matches.length === 2) {
+    team1 = matches[0];
+    team2 = matches[1];
+} else {
+    matches = s.match(/(?:South Africa|New Zealand|Sri Lanka)|[A-Z][a-z]*/g); // This regex handles cases like "SouthAfrica" or "NewZealand"
+    if (matches && matches.length === 2) {
+        team1 = matches[0];
+        team2 = matches[1];
+    } else {
+        // Handle other cases or errors here
+    }
+}
+matchInfo = team1 +  ' Vs ' + team2
+
+var tables = $('div > table.ci-scorecard-table');
+var firstInningRows = $(tables.eq(0)).find('tbody > tr').filter(function(index, element){
+  return $(this).find("td").length >= 8
+})
+
+var secondInningsRows = $(tables.eq(1)).find('tbody > tr').filter(function(index, element){
+  return $(this).find("td").length >= 8
+});
+
+
+var battingSummary = []
+firstInningRows.each((index, element) => {
+  var tds = $(element).find('td');
+  battingSummary.push({
+  		"match": matchInfo,
+  		"teamInnings": team1,
+   		"battingPos": index+1,
+  		"batsmanName": $(tds.eq(0)).find('a > span > span').text().replace(' ', ''),
+    	"dismissal": $(tds.eq(1)).find('span > span').text(),
+  		"runs": $(tds.eq(2)).find('strong').text(), 
+  		"balls": $(tds.eq(3)).text(),
+  		"4s": $(tds.eq(5)).text(),
+  		"6s": $(tds.eq(6)).text(),
+ 		"SR": $(tds.eq(7)).text()
+  });
+});
+
+secondInningsRows.each((index, element) => {
+  var tds = $(element).find('td');
+   battingSummary.push({
+  		"match": matchInfo,
+  		"teamInnings": team2,
+   		"battingPos": index+1,
+  		"batsmanName": $(tds.eq(0)).find('a > span > span').text().replace(' ', ''),
+     	"dismissal": $(tds.eq(1)).find('span > span').text(),
+  		"runs": $(tds.eq(2)).find('strong').text(), 
+  		"balls": $(tds.eq(3)).text(),
+  		"4s": $(tds.eq(5)).text(),
+  		"6s": $(tds.eq(6)).text(),
+ 		"SR": $(tds.eq(7)).text()
+  });
+});
+
+return {"battingSummary": battingSummary}
