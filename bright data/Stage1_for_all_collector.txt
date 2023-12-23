@@ -1,0 +1,24 @@
+//-----------------------Interaction code 
+navigate("https://www.espncricinfo.com/records/tournament/team-match-results/icc-cricket-world-cup-2023-24-15338")
+let links = parse().matchSummaryLinks;
+for(let i of links) { 
+  next_stage({url: i}) 
+}
+//----------parse Code-------------
+let links = [];
+const allRows = $('tr.ds-bg-ui-fill-translucent, tr[class=""]');
+allRows.each((index, element) => {
+    const row = $(element);
+    
+    // Find the <a> tag within the specified <td>
+    const link = row.find('td.ds-min-w-max:nth-child(7) a').attr('href');
+    
+    if (link) {
+        const fullURL = "https://www.espncricinfo.com" + link;
+        links.push(fullURL);
+    }
+});
+
+return {
+    'matchSummaryLinks': links
+};
